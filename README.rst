@@ -6,7 +6,6 @@ httpdebug
    :width: 49%
 .. image:: https://godoc.org/github.com/kisom/httpdebug?status.svg
    :target: https://godoc.org/github.com/kisom/httpdebug
-   :width: 49%
 
 This package provides debugging endpoints to which IP whitelisting and
 timeout constrains can be added. It is designed to return an HTTP
