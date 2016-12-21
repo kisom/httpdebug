@@ -15,8 +15,9 @@ script:
   - fgt golint github.com/kisom/httpdebug/internal/...
   - staticcheck github.com/kisom/httpdebug
   - staticcheck github.com/kisom/httpdebug/internal/...
+  - go test -covermode atomic -coverprofile coverage.txt -coverpkg github.com/kisom/httpdebug,github.com/kisom/httpdebug/internal/debug,github.com/kisom/httpdebug/whitelist
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -f coverage.txt
 notifications:
   email:
     recipients:
