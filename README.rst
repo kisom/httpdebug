@@ -1,6 +1,11 @@
 httpdebug
 =========
 
+.. image:: https://travis-ci.org/kisom/httpdebug.svg?branch=master
+
+.. image:: https://godoc.org/github.com/kisom/httpdebug?status.svg
+   :target: https://godoc.org/github.com/kisom/httpdebug
+
 This package provides debugging endpoints to which IP whitelisting and
 timeout constrains can be added. It is designed to return an HTTP
 handler that can be integrated into whatever HTTP server setup is
