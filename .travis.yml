@@ -14,9 +14,11 @@ script:
   - fgt golint github.com/kisom/httpdebug/internal/...
   - staticcheck github.com/kisom/httpdebug
   - staticcheck github.com/kisom/httpdebug/internal/...
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
     recipients:
       - coder@kyleisom.net
-      on_success: change
-      on_failure: change
+    on_success: change
+    on_failure: change
