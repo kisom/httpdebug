@@ -4,6 +4,7 @@ package debug
 import (
 	"net"
 	"net/http"
+	"net/http/pprof"
 	"time"
 
 	"github.com/kisom/httpdebug/whitelist"
@@ -158,14 +159,24 @@ func (d *Debug) LocalAdmin() {
 	d.SetAdminACL(localhost)
 }
 
-// Handle registers a new handler.
+// Handle registers a new handler. Note that only patterns under
+// "/debug/" will actually be handled.
 func (d *Debug) Handle(pat string, h http.Handler) {
 	handler := d.aclHandler(h)
 	d.mux.Handle(pat, d.timeout(handler))
 }
 
-// HandleFunc registers a new handler function.
+// HandleFunc registers a new handler function. Note that only
+// patterns under "/debug/" will actually be handled.
 func (d *Debug) HandleFunc(pat string, f func(http.ResponseWriter, *http.Request)) {
 	h := d.setupHandler(f)
 	d.mux.Handle(pat, h)
+}
+
+// AddProfile registers a new profile endpoint for pprof.
+func (d *Debug) AddProfile(name string) {
+	d.endpoints[name] = pprof.Handler(name)
+	if d.setup {
+		d.mux.Handle("/debug/pprof/"+name, d.endpoints[name])
+	}
 }
