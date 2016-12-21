@@ -1,0 +1,22 @@
+sudo: false
+language: go
+go:
+  - tip
+  - 1.7
+script:
+  - go get golang.org/x/tools/cmd/goimports
+  - go get github.com/golang/lint/golint
+  - go get github.com/GeertJohan/fgt
+  - go get github.com/kisom/httpdebug/...
+  - go test github.com/kisom/httpdebug/...
+  - go vet github.com/kisom/httpdebug/...
+  - fgt golint github.com/kisom/httpdebug
+  - fgt golint github.com/kisom/httpdebug/internal/...
+  - staticcheck github.com/kisom/httpdebug
+  - staticcheck github.com/kisom/httpdebug/internal/...
+notifications:
+  email:
+    recipients:
+      - coder@kyleisom.net
+      on_success: change
+      on_failure: change
