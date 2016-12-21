@@ -6,6 +6,7 @@ go:
 script:
   - go get golang.org/x/tools/cmd/goimports
   - go get github.com/golang/lint/golint
+  - go get honnef.co/go/staticcheck/cmd/staticcheck
   - go get github.com/GeertJohan/fgt
   - go get github.com/kisom/httpdebug/...
   - go test github.com/kisom/httpdebug/...
