@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"runtime/pprof"
 	"testing"
 
 	"github.com/kisom/httpdebug/internal/debug"
@@ -14,10 +15,10 @@ import (
 
 func testEndpoint(url string, expected int) error {
 	resp, err := http.Get(url)
-	resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	resp.Body.Close()
 
 	if resp.StatusCode != expected {
 		return fmt.Errorf("debug: expected %s to return %d ('%s'), but got %d ('%s')",
@@ -176,6 +177,25 @@ func TestRegister(t *testing.T) {
 	}
 
 	err = Register(nil)
+	if err != nil {
+		t.Fatalf("%s", err)
+	}
+}
+
+func TestAddProfile(t *testing.T) {
+	p := pprof.NewProfile("pkg/httpdebug")
+	AddProfile("pkg/httpdebug")
+	p.Add("first dump", 0)
+
+	handler, err := Handler()
+	if err != nil {
+		t.Fatalf("%s", err)
+	}
+
+	srv := httptest.NewServer(handler)
+	defer srv.Close()
+
+	err = testEndpoint(srv.URL+"/debug/pprof/pkg/httpdebug", http.StatusOK)
 	if err != nil {
 		t.Fatalf("%s", err)
 	}

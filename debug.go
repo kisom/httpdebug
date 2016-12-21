@@ -65,11 +65,13 @@ func New(acl whitelist.ACL, admin func(*http.Request) bool, timeout time.Duratio
 	return nil
 }
 
+var errNotSetup = errors.New("httpdebug: the debug handler has not been set up (use one of the New functions)")
+
 // setup verifies that the debug handler has been instantiated
 // (e.g. via NewLocalhost) and sets up the handler.
 func setup() (err error) {
 	if debugger == nil {
-		return errors.New("httpdebug: the debug handler has not been set up (use one of the New functions)")
+		return errNotSetup
 	}
 
 	debugger.Register()
@@ -159,7 +161,8 @@ func LocalAdmin() {
 }
 
 // Handle registers a new handler. It is intended to allow additional
-// debugging tools to be enabled.
+// debugging tools to be enabled. One of the New functions must have
+// been called already.
 func Handle(pat string, h http.Handler) {
 	lock.Lock()
 	defer lock.Unlock()
@@ -167,11 +170,22 @@ func Handle(pat string, h http.Handler) {
 	debugger.Handle(pat, h)
 }
 
-// HandleFunc registers a new handler function. It is intended to allow additional
-// debugging tools to be enabled.
+// HandleFunc registers a new handler function. It is intended to
+// allow additional debugging tools to be enabled. One of the New
+// functions must have been called already.
 func HandleFunc(pat string, f func(http.ResponseWriter, *http.Request)) {
 	lock.Lock()
 	defer lock.Unlock()
 
 	debugger.HandleFunc(pat, f)
+}
+
+// AddProfile registers a new profile endpoint for pprof under
+// /debug/profile/name. The profile must already have been created
+// using the runtime/pprof package.
+func AddProfile(name string) {
+	lock.Lock()
+	defer lock.Unlock()
+
+	debugger.AddProfile(name)
 }

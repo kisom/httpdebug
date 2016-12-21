@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"runtime/pprof"
 	"testing"
 	"time"
 
@@ -16,10 +17,10 @@ import (
 
 func testEndpoint(url string, expected int) error {
 	resp, err := http.Get(url)
-	resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	resp.Body.Close()
 
 	if resp.StatusCode != expected {
 		return fmt.Errorf("debug: expected %s to return %d ('%s'), but got %d ('%s')",
@@ -183,5 +184,21 @@ func TestAdminAuth(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s", err)
 	}
+}
 
+func TestAddProfile(t *testing.T) {
+	debug := NewLocalhost(0, true, false)
+	debug.Register()
+
+	p := pprof.NewProfile("pkg/debug")
+	debug.AddProfile("pkg/debug")
+	p.Add("first dump", 0)
+
+	srv := httptest.NewServer(debug)
+	defer srv.Close()
+
+	err := testEndpoint(srv.URL+"/debug/pprof/pkg/debug", http.StatusOK)
+	if err != nil {
+		t.Fatalf("%s", err)
+	}
 }
